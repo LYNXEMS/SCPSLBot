@@ -59,7 +59,7 @@ class Owner:
     #    f = open('/var/www/SCPSLBot/SCPSLBot/data/red/red.log', 'r+')
     #    f.truncate()
 
-    @commands.has_permissions(manage_server=True)
+    @checks.is_owner()
     @commands.command(hidden=True)
     async def pull(self, *gamename):
         """Pull new changes from GitHub and restart."""
