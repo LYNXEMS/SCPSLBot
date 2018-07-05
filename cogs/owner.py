@@ -59,13 +59,18 @@ class Owner:
     #    f = open('/var/www/SCPSLBot/SCPSLBot/data/red/red.log', 'r+')
     #    f.truncate()
 
-    #@commands.command(hidden=True)
-    #async def pull(self):
-    #    """Pull new changes from GitHub and restart."""
-    #    await self.bot.say("Pulling changes...")
-    #    call(['git', 'pull'])
-    #    await self.bot.say("?? Restarting bot!")
-    #    await self.bot.close()
+    @commands.has_permissions(manage_server=True)
+    @commands.command(hidden=True)
+    async def pull(self, *gamename):
+        """Pull new changes from GitHub and restart."""
+        await self.bot.say("Pulling changes...")
+        call(['git', 'pull'])
+        try:
+            if not silently:
+                await self.bot.say("Restarting...")
+        except:
+            pass
+        await self.bot.shutdown(restart=True)
 
     @commands.command()
     @checks.is_owner()
@@ -637,7 +642,7 @@ class Owner:
         await self.bot.say("Whitelist is now empty.")
 
     @commands.group(pass_context=True)
-    #@checks.admin_or_permissions(administrator=True)
+    @checks.admin_or_permissions(administrator=True)
     async def override(self, ctx):
         """Override management commands
 
