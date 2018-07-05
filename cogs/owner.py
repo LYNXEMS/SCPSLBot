@@ -65,11 +65,7 @@ class Owner:
         """Pull new changes from GitHub and restart."""
         await self.bot.say("Pulling changes...")
         call(['git', 'pull'])
-        try:
-            if not silently:
-                await self.bot.say("Restarting...")
-        except:
-            pass
+        await self.bot.say("Restarting...")
         await self.bot.shutdown(restart=True)
 
     @commands.command()
