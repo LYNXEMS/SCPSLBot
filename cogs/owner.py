@@ -59,13 +59,13 @@ class Owner:
     #    f = open('/var/www/SCPSLBot/SCPSLBot/data/red/red.log', 'r+')
     #    f.truncate()
 
-    #@commands.command(hidden=True)
-    #async def pull(self):
-    #    """Pull new changes from GitHub and restart."""
-    #    await self.bot.say("Pulling changes...")
-    #    call(['git', 'pull'])
-    #    await self.bot.say("?? Restarting bot!")
-    #    await self.bot.close()
+    @commands.command(hidden=True)
+    async def pull(self):
+        """Pull new changes from GitHub and restart.""" 
+        await self.bot.say("Pulling changes...") 
+        call(['git', 'pull']) 
+        await self.bot.say("Restarting...") 
+        await self.bot.shutdown(restart=True) 
 
     @commands.command()
     async def load(self, *, cog_name: str):
