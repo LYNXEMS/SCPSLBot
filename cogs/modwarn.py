@@ -80,7 +80,7 @@ class ModWarn:
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
-        if discord.utils.get(message.server.roles, name="Discord Mod - MTF Nine Tailed Fox") or discord.utils.get(ctx.message.server.roles, name="Admin - MTF Red Right Hand") in member.roles:
+        if discord.utils.get(ctx.message.server.roles, name="Discord Mod - MTF Nine Tailed Fox") or discord.utils.get(ctx.message.server.roles, name="Admin - MTF Red Right Hand") in member.roles:
             await self.bot.say("PREVENTING STAFF WARNING!")
             return
         if member.id not in warns:
