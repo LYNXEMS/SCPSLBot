@@ -28,7 +28,7 @@ class ModWarn:
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
-        if len(member.roles) =! 1:
+        if len(member.roles) != 1:
             return
         if member.id not in warns:
             warns[member.id] = {"warns": []}
