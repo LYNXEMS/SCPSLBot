@@ -28,7 +28,7 @@ class ModWarn:
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
-        if discord.utils.get(message.server.roles, name="Discord Mod - MTF Nine Tailed Fox") in member.roles or discord.utils.get(message.server.roles, name="Admin - MTF Red Right Hand") in member.roles or discord.utils.get(message.server.roles, name="The O5 Council") in member.roles:
+        if len(member.roles) =! 1:
             return
         if member.id not in warns:
             warns[member.id] = {"warns": []}
