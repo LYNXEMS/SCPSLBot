@@ -394,7 +394,7 @@ class Mod:
         server = ctx.message.server
         role = discord.utils.get(ctx.message.server.roles, name="Advertiser")
         await self.bot.add_roles(user, role)
-        await self.bot.say("Done. User now has two minutes to create the advertisement before he is disallowed access.")
+        await self.bot.say("Done. User now has two minutes to create the advertisement before they are disallowed access.")
         await asyncio.sleep(120)
         await self.bot.remove_roles(user, role)
         await self.bot.say("The Advertiser role has been removed from the user.")
