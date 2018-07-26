@@ -391,7 +391,8 @@ class Mod:
     @checks.admin_or_permissions(kick_members=True)
     async def advert(self, ctx, user : discord.Member):
         """Allows the user to advertise"""
-        role = discord.utils.get(message.server.roles, name="Advertiser")
+        server = ctx.message.server
+        role = discord.utils.get(ctx.message.server.roles, name="Advertiser")
         await self.bot.add_roles(user, role)
         await self.bot.say("Done. User now has two minutes to create the advertisement before he is disallowed access.")
         await asyncio.sleep(120)
