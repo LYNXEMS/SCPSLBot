@@ -387,6 +387,17 @@ class Mod:
             await self.bot.say("I cannot do that, I lack the "
                                "\"Manage Nicknames\" permission.")
 
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(kick_members=True)
+    async def advert(self, ctx, user : discord.Member):
+        """Allows the user to advertise"""
+        role = discord.utils.get(message.server.roles, name="Advertiser")
+        await self.bot.add_roles(user, role)
+        await self.bot.say("Done. User now has two minutes to create the advertisement before he is disallowed access.")
+        await asyncio.sleep(120)
+        await self.bot.remove_roles(user, role)
+        await self.bot.say("The Advertiser role has been removed from the user.")
+
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     @checks.mod_or_permissions(kick_members=True)
     async def mute(self, ctx, user : discord.Member, *, reason: str = None):
