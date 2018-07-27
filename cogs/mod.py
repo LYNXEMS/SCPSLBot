@@ -500,31 +500,11 @@ class Mod:
                                "not higher than the user in the role "
                                "hierarchy.")
             return
-
-        register = {}
-        for channel in server.channels:
-            if channel.type != discord.ChannelType.text:
-                continue
-            overwrites = channel.overwrites_for(user)
-            if overwrites.send_messages is False:
-                continue
-            register[channel.id] = overwrites.send_messages
-            overwrites.send_messages = False
-            try:
-                await self.bot.edit_channel_permissions(channel, user,
-                                                        overwrites)
-            except discord.Forbidden:
-                await self.bot.say("Failed to mute user. I need the manage roles "
-                                   "permission and the user I'm muting must be "
-                                   "lower than myself in the role hierarchy.")
-                return
-            else:
-                await asyncio.sleep(0.1)
-        if not register:
+        if discord.utils.get(server.roles, name="Muted") in user.roles:
             await self.bot.say("That user is already muted in all channels.")
             return
-        self._perms_cache[user.id] = register
-        dataIO.save_json("data/mod/perms_cache.json", self._perms_cache)
+        role = discord.utils.get(server.roles, name="Muted")
+        await self.bot.add_roles(user, role)
         await self.new_case(server,
                             action="SMUTE",
                             mod=author,
@@ -590,47 +570,19 @@ class Mod:
     @unmute.command(name="server", pass_context=True, no_pm=True)
     async def server_unmute(self, ctx, user : discord.Member):
         """Unmutes user in the server"""
-        server = ctx.message.server
         author = ctx.message.author
+        server = ctx.message.server
 
-        if user.id not in self._perms_cache:
-            await self.bot.say("That user doesn't seem to have been muted with {0}mute commands. "
-                               "Unmute them in the channels you want with `{0}unmute <user>`"
-                               "".format(ctx.prefix))
-            return
-        elif not self.is_allowed_by_hierarchy(server, author, user):
+        if not self.is_allowed_by_hierarchy(server, author, user):
             await self.bot.say("I cannot let you do that. You are "
                                "not higher than the user in the role "
                                "hierarchy.")
             return
-
-        for channel in server.channels:
-            if channel.type != discord.ChannelType.text:
-                continue
-            if channel.id not in self._perms_cache[user.id]:
-                continue
-            value = self._perms_cache[user.id].get(channel.id)
-            overwrites = channel.overwrites_for(user)
-            if overwrites.send_messages is False:
-                overwrites.send_messages = value
-                is_empty = self.are_overwrites_empty(overwrites)
-                try:
-                    if not is_empty:
-                        await self.bot.edit_channel_permissions(channel, user,
-                                                                overwrites)
-                    else:
-                        await self.bot.delete_channel_permissions(channel, user)
-                except discord.Forbidden:
-                    await self.bot.say("Failed to unmute user. I need the manage roles"
-                                       " permission and the user I'm unmuting must be "
-                                       "lower than myself in the role hierarchy.")
-                    return
-                else:
-                    del self._perms_cache[user.id][channel.id]
-                    await asyncio.sleep(0.1)
-        if user.id in self._perms_cache and not self._perms_cache[user.id]:
-            del self._perms_cache[user.id]  # cleanup
-        dataIO.save_json("data/mod/perms_cache.json", self._perms_cache)
+        if discord.utils.get(server.roles, name="Muted") not in user.roles:
+            await self.bot.say("That user is not muted in this server.")
+            return
+        role = discord.utils.get(server.roles, name="Muted")
+        await self.bot.remove_roles(user, role)
         await self.bot.say("User has been unmuted in this server.")
 
     @commands.group(pass_context=True)

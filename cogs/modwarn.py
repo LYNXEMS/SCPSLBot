@@ -56,7 +56,7 @@ class ModWarn:
         if warn_count == 2:
             await self.bot.kick(member)
         if warn_count >= 3:
-            role = discord.utils.get(message.server.roles, name="Class D - Muted")
+            role = discord.utils.get(message.server.roles, name="Muted")
             await self.bot.add_roles(member, role)
         await self.bot.send_message(channel, "A human, {} warned for pinging Hubie with {} warns total now".format(member.mention, len(warns[member.id]["warns"])))
         msg = "⚠️ **Warn**:{} was warned for Pinging Hubert with his/her warn total now being {} | {}#{}".format(member.mention, len(warns[member.id]["warns"]), member.name, member.discriminator)
@@ -112,7 +112,7 @@ class ModWarn:
         if warn_count == 2:
             await self.bot.kick(member)
         if warn_count >= 3:
-            role = discord.utils.get(ctx.message.server.roles, name="Class D - Muted")
+            role = discord.utils.get(ctx.message.server.roles, name="Muted")
             await self.bot.add_roles(member, role)
         await self.bot.say("A human, {} warned with {} warns total now".format(member.mention, len(warns[member.id]["warns"])))
         msg = "⚠️ **Warn**: {} warned {} with his/her warn total now being {} | {}#{}".format(issuer.mention, member.mention, len(warns[member.id]["warns"]), member.name, member.discriminator)
@@ -253,7 +253,7 @@ class ModWarn:
         await self.bot.say("Human, one warn has been deleted from {}!".format(member.mention))
         if warn_count == 3:
             await self.bot.say("Removing Class D status if existed!")
-            await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="Class D - Muted"))
+            await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="Muted"))
         msg = "🗑 **Warn removed**: {} deleted a warn issued by {} from {} | {}#{}".format(ctx.message.author.mention, idx, member.mention, member.name, member.discriminator)
         await self.bot.send_message(logchannel, msg, embed=embed)
 
@@ -314,7 +314,7 @@ class ModWarn:
         await self.bot.say("Human, {} no longer has any warns!".format(member.mention))
         if warn_count >= 3:
             await self.bot.say("Removing Class D status if existed!")
-            await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="Class D - Muted"))
+            await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="Muted"))
         msg = "🗑 **Cleared warns**: {} cleared {} warns from {} | {}#{}".format(ctx.message.author.mention, warn_count, member.mention, member.name, member.discriminator)
         await self.bot.send_message(logchannel, msg)
 
