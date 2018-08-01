@@ -7,20 +7,61 @@ class Patreon:
 
     async def on_member_update(self, before, after):
         server = before.server
-        patroles = [discord.utils.get(server.roles, name="Patreon level - Facility Manager"),
-                    discord.utils.get(server.roles, name="Patreon level - Zone Manager"),
-                    discord.utils.get(server.roles, name="Patreon level - Major Scientist"),
-                    discord.utils.get(server.roles, name="Patreon level - Scientist"),
-                    discord.utils.get(server.roles, name="Patreon level - Janitor")]
         if before.roles == after.roles:
             return
-        elif len(list(set(after.roles).intersection(patroles))) > 0 and discord.utils.get(server.roles, name="Patreon Supporters") not in after.roles:
+        if discord.utils.get(server.roles,
+                             name="Patreon level - Facility Manager") in after.roles and discord.utils.get(server.roles,
+                                                                                                           name="Patreon Supporters") not in after.roles:
             await asyncio.sleep(1)
             await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
             return
-        elif len(list(set(after.roles).intersection(patroles))) == 0 and discord.utils.get(server.roles, name="Patreon Supporters") in after.roles:
+        if discord.utils.get(server.roles, name="Patreon level - Zone Manager") in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") not in after.roles:
             await asyncio.sleep(1)
-            await self.bot.remove_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles, name="Patreon level - Major Scientist") in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") not in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles, name="Patreon level - Scientist") in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") not in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles, name="Patreon level - Janitor") in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") not in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles,
+                             name="Patreon level - Facility Manager") not in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles,
+                             name="Patreon level - Zone Manager") not in after.roles and discord.utils.get(server.roles,
+                                                                                                           name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles,
+                             name="Patreon level - Major Scientist") not in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles, name="Patreon level - Scientist") not in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
+            return
+        if discord.utils.get(server.roles, name="Patreon level - Janitor") not in after.roles and discord.utils.get(
+                server.roles, name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
             return
 
 
