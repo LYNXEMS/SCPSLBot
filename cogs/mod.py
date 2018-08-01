@@ -320,6 +320,49 @@ class Mod:
 
     @commands.command(no_pm=True, pass_context=True)
     @checks.admin_or_permissions(ban_members=True)
+    async def hackban(self, ctx, user_id: int, *, reason: str = None):
+        """Preemptively bans user from the server
+
+        A user ID needs to be provided
+        If the user is present in the server a normal ban will be
+        issued instead"""
+        user_id = str(user_id)
+        author = ctx.message.author
+        server = author.server
+
+        ban_list = await self.bot.get_bans(server)
+        is_banned = discord.utils.get(ban_list, id=user_id)
+
+        if is_banned:
+            await self.bot.say("User is already banned.")
+            return
+
+        user = server.get_member(user_id)
+        if user is not None:
+            await ctx.invoke(self.ban, user=user, reason=reason)
+            return
+
+        try:
+            await self.bot.http.ban(user_id, server.id, 0)
+        except discord.NotFound:
+            await self.bot.say("User not found. Have you provided the "
+                               "correct user ID?")
+        except discord.Forbidden:
+            await self.bot.say("I lack the permissions to do this.")
+        else:
+            logger.info("{}({}) hackbanned {}"
+                        "".format(author.name, author.id, user_id))
+            user = await self.bot.get_user_info(user_id)
+            await self.new_case(server,
+                                action="HACKBAN",
+                                mod=author,
+                                user=user,
+                                reason=reason)
+            await self.bot.say("Done. The user will not be able to join this "
+                               "server.")
+
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(ban_members=True)
     async def softban(self, ctx, user: discord.Member, *, reason: str = None):
         """Kicks the user, deleting 1 day worth of messages."""
         server = ctx.message.server
@@ -387,6 +430,18 @@ class Mod:
             await self.bot.say("I cannot do that, I lack the "
                                "\"Manage Nicknames\" permission.")
 
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(kick_members=True)
+    async def advert(self, ctx, user : discord.Member):
+        """Allows the user to advertise"""
+        server = ctx.message.server
+        role = discord.utils.get(ctx.message.server.roles, name="Advertiser")
+        await self.bot.add_roles(user, role)
+        await self.bot.say("Done. User now has two minutes to create the advertisement before they are disallowed access.")
+        await asyncio.sleep(120)
+        await self.bot.remove_roles(user, role)
+        await self.bot.say("The Advertiser role has been removed from the user.")
+
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     @checks.mod_or_permissions(kick_members=True)
     async def mute(self, ctx, user : discord.Member, *, reason: str = None):
@@ -445,31 +500,11 @@ class Mod:
                                "not higher than the user in the role "
                                "hierarchy.")
             return
-
-        register = {}
-        for channel in server.channels:
-            if channel.type != discord.ChannelType.text:
-                continue
-            overwrites = channel.overwrites_for(user)
-            if overwrites.send_messages is False:
-                continue
-            register[channel.id] = overwrites.send_messages
-            overwrites.send_messages = False
-            try:
-                await self.bot.edit_channel_permissions(channel, user,
-                                                        overwrites)
-            except discord.Forbidden:
-                await self.bot.say("Failed to mute user. I need the manage roles "
-                                   "permission and the user I'm muting must be "
-                                   "lower than myself in the role hierarchy.")
-                return
-            else:
-                await asyncio.sleep(0.1)
-        if not register:
+        if discord.utils.get(server.roles, name="Muted") in user.roles:
             await self.bot.say("That user is already muted in all channels.")
             return
-        self._perms_cache[user.id] = register
-        dataIO.save_json("data/mod/perms_cache.json", self._perms_cache)
+        role = discord.utils.get(server.roles, name="Muted")
+        await self.bot.add_roles(user, role)
         await self.new_case(server,
                             action="SMUTE",
                             mod=author,
@@ -535,47 +570,19 @@ class Mod:
     @unmute.command(name="server", pass_context=True, no_pm=True)
     async def server_unmute(self, ctx, user : discord.Member):
         """Unmutes user in the server"""
-        server = ctx.message.server
         author = ctx.message.author
+        server = ctx.message.server
 
-        if user.id not in self._perms_cache:
-            await self.bot.say("That user doesn't seem to have been muted with {0}mute commands. "
-                               "Unmute them in the channels you want with `{0}unmute <user>`"
-                               "".format(ctx.prefix))
-            return
-        elif not self.is_allowed_by_hierarchy(server, author, user):
+        if not self.is_allowed_by_hierarchy(server, author, user):
             await self.bot.say("I cannot let you do that. You are "
                                "not higher than the user in the role "
                                "hierarchy.")
             return
-
-        for channel in server.channels:
-            if channel.type != discord.ChannelType.text:
-                continue
-            if channel.id not in self._perms_cache[user.id]:
-                continue
-            value = self._perms_cache[user.id].get(channel.id)
-            overwrites = channel.overwrites_for(user)
-            if overwrites.send_messages is False:
-                overwrites.send_messages = value
-                is_empty = self.are_overwrites_empty(overwrites)
-                try:
-                    if not is_empty:
-                        await self.bot.edit_channel_permissions(channel, user,
-                                                                overwrites)
-                    else:
-                        await self.bot.delete_channel_permissions(channel, user)
-                except discord.Forbidden:
-                    await self.bot.say("Failed to unmute user. I need the manage roles"
-                                       " permission and the user I'm unmuting must be "
-                                       "lower than myself in the role hierarchy.")
-                    return
-                else:
-                    del self._perms_cache[user.id][channel.id]
-                    await asyncio.sleep(0.1)
-        if user.id in self._perms_cache and not self._perms_cache[user.id]:
-            del self._perms_cache[user.id]  # cleanup
-        dataIO.save_json("data/mod/perms_cache.json", self._perms_cache)
+        if discord.utils.get(server.roles, name="Muted") not in user.roles:
+            await self.bot.say("That user is not muted in this server.")
+            return
+        role = discord.utils.get(server.roles, name="Muted")
+        await self.bot.remove_roles(user, role)
         await self.bot.say("User has been unmuted in this server.")
 
     @commands.group(pass_context=True)

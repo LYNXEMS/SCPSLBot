@@ -1,12 +1,9 @@
+import datetime
+import os
+import discord
 from discord.ext import commands
 from cogs.utils import checks
-import datetime
 from cogs.utils.dataIO import fileIO
-import discord
-import asyncio
-import os
-import string
-from random import choice, randint
 
 inv_settings = {"embed": True, "Channel": 402953340637413386, "toggleedit": True, "toggledelete": True, "toggleuser": True,
                 "toggleroles": True,
@@ -458,9 +455,9 @@ class Logging:
                     url="http://www.hey.fr/fun/emoji/twitter/en/icon/twitter/565-emoji_twitter_speaker_with_three_sound_waves.png")
                 infomsg = ":loud_sound: Voice Channel bitrate update. Before: **{}** After: **{}**.".format(
                     before.bitrate, after.bitrate)
-                bitrate.add_field(name="Info:", value=infosg, inline=False)
+                bitrate.add_field(name="Info:", value=infomsg, inline=False)
                 try:
-                    await sef.bot.send_message(server.get_channel(channel), embed=bitrate)
+                    await self.bot.send_message(server.get_channel(channel), embed=bitrate)
                 except:
                     pass
             else:
@@ -634,7 +631,7 @@ class Logging:
                 role.set_thumbnail(
                     url="http://www.emoji.co.uk/files/mozilla-emojis/objects-mozilla/11928-outbox-tray.png")
                 try:
-                    await self.bot.send_message(server.get_channel(channel), embed=leave)
+                    await self.bot.send_message(server.get_channel(channel), embed=role)
                 except:
                     await self.bot.send_message(server.get_channel(channel),
                                                 "How is embed going to work when I don't have embed links permissions?")
