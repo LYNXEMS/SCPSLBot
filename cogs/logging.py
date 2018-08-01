@@ -603,7 +603,6 @@ class Logging:
 
     async def on_member_update(self, before, after):
         server = before.server
-        member = before.member
         db = fileIO(self.direct, "load")
         if not server.id in db:
             return
