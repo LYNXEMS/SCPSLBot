@@ -9,9 +9,9 @@ class Patreon:
         server = before.server
         patroles = [discord.utils.get(message.server.roles, name="Patreon level - Facility Manager"), discord.utils.get(message.server.roles, name="Patreon level - Zone Manager"), discord.utils.get(message.server.roles, name="Patreon level - Major Scientist"), discord.utils.get(message.server.roles, name="Patreon level - Scientist"), discord.utils.get(message.server.roles, name="Patreon level - Janitor")]
         if len(list(set(after.roles).intersection(patroles))) > 0 and discord.utils.get(message.server.roles, name="Patreon Supporter") not in after.roles:
-            await self.bot.add_roles(member, discord.utils.get(server.roles, name="Patreon Supporter"))
+            await self.bot.add_roles(member, discord.utils.get(server.roles, name="Patreon Supporters"))
         elif len(list(set(after.roles).intersection(patroles))) == 0 and discord.utils.get(message.server.roles, name="Patreon Supporter") in after.roles:
-            await self.bot.remove_roles(member, discord.utils.get(server.roles, name="Patreon Supporter"))
+            await self.bot.remove_roles(member, discord.utils.get(server.roles, name="Patreon Supporters"))
         else:
             return
             
