@@ -15,12 +15,12 @@ class Patreon:
         if before.roles == after.roles:
             return
         elif len(list(set(after.roles).intersection(patroles))) > 0 and discord.utils.get(server.roles, name="Patreon Supporters") not in after.roles:
+            await asyncio.sleep(1)
             await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
             return
         elif len(list(set(after.roles).intersection(patroles))) == 0 and discord.utils.get(server.roles, name="Patreon Supporters") in after.roles:
+            await asyncio.sleep(1)
             await self.bot.remove_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
-            return
-        else:
             return
 
 
