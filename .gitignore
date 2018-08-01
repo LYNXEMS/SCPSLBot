@@ -9,6 +9,7 @@
 __pycache__
 data/
 lib/
+.idea/
 launcher.py
 requirements.txt
 requirements_no_audio.txt
