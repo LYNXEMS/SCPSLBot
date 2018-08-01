@@ -7,7 +7,6 @@ class Patreon:
 
     async def on_member_update(self, before, after):
         server = before.server
-        member = before.member
         patroles = [discord.utils.get(server.roles, name="Patreon level - Facility Manager"),
                     discord.utils.get(server.roles, name="Patreon level - Zone Manager"),
                     discord.utils.get(server.roles, name="Patreon level - Major Scientist"),
@@ -16,9 +15,9 @@ class Patreon:
         if before.roles == after.roles:
             return
         elif len(list(set(after.roles).intersection(patroles))) > 0 and discord.utils.get(server.roles, name="Patreon Supporters") not in after.roles:
-            await self.bot.add_roles(member, discord.utils.get(server.roles, name="Patreon Supporters"))
+            await self.bot.add_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
         elif len(list(set(after.roles).intersection(patroles))) == 0 and discord.utils.get(server.roles, name="Patreon Supporters") in after.roles:
-            await self.bot.remove_roles(member, discord.utils.get(server.roles, name="Patreon Supporters"))
+            await self.bot.remove_roles(before, discord.utils.get(server.roles, name="Patreon Supporters"))
         else:
             return
 

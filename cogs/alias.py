@@ -129,8 +129,7 @@ class Alias:
                 new_message.content = prefix + new_command + args
                 await self.bot.process_commands(new_message)
 
-    def part_of_existing_command(self, alias, server):
-        '''Command or alias'''
+    def part_of_existing_command(self, alias):
         for command in self.bot.commands:
             if alias.lower() == command.lower():
                 return True
