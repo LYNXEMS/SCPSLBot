@@ -1237,7 +1237,6 @@ class Mod:
         server = ctx.message.server
         issuer = ctx.message.author
         logchannel = discord.utils.get(server.channels, name="warnings")
-        author = ctx.message.author
         try:
             member = ctx.message.mentions[0]
         except IndexError:
@@ -1251,11 +1250,11 @@ class Mod:
         if discord.utils.get(ctx.message.server.roles, name="WARNED") in member.roles:
             await self.bot.say("PREVENTING MULTI WARNING!")
             return
-        if author == member:
+        if issuer == member:
             await self.bot.say("I cannot let you do that. Self-harm is "
                                "bad \N{PENSIVE FACE}")
             return
-        elif not self.is_allowed_by_hierarchy(server, author, member):
+        elif not self.is_allowed_by_hierarchy(server, issuer, member):
             await self.bot.say("I cannot let you do that. You are "
                                "not higher than the user in the role "
                                "hierarchy.")
@@ -1396,6 +1395,7 @@ class Mod:
         """Remove a specific warn from a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
+        author = ctx.message.author
         try:
             member = ctx.message.mentions[0]
         except IndexError:
