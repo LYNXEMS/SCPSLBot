@@ -1232,7 +1232,7 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def warn(self, ctx, user, *, reason=""):
+    async def warn(self, ctx, user: discord.Member, *, reason=""):
         """Warn a user."""
         server = ctx.message.server
         issuer = ctx.message.author
@@ -1248,7 +1248,7 @@ class Mod:
                                "hierarchy.")
             return
         try:
-            member = ctx.message.mentions[0]
+            member = user
         except IndexError:
             await self.bot.say("Please tag an user.")
             return
@@ -1297,13 +1297,13 @@ class Mod:
         await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="WARNED"))
 
     @commands.command(pass_context=True)
-    async def listwarns(self, ctx, user):
+    async def listwarns(self, ctx, user: discord.Member):
         """List warns for a user."""
         server = ctx.message.server
         issuer = ctx.message.author
         logchannel = discord.utils.get(server.channels, name="warnings")
         try:
-            member = ctx.message.mentions[0]
+            member = user
         except IndexError:
             await self.bot.say("ERROR, user not tagged.")
             return
@@ -1392,7 +1392,7 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def delwarn(self, ctx, user, idx: int):
+    async def delwarn(self, ctx, user: discord.Member, idx: int):
         """Remove a specific warn from a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
@@ -1407,7 +1407,7 @@ class Mod:
                                "hierarchy.")
             return
         try:
-            member = ctx.message.mentions[0]
+            member = user
         except IndexError:
             await self.bot.say("ERROR, user not tagged.")
             return
@@ -1472,7 +1472,7 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def clearwarns(self, ctx, user):
+    async def clearwarns(self, ctx, user: discord.Member):
         """Clear all warns for a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
@@ -1487,7 +1487,7 @@ class Mod:
                                "hierarchy.")
             return
         try:
-            member = ctx.message.mentions[0]
+            member = user
         except IndexError:
             await self.bot.say("ERROR, user not tagged.")
             return
