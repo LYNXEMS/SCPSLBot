@@ -1230,26 +1230,20 @@ class Mod:
         await self.bot.remove_roles(member, discord.utils.get(message.server.roles, name="WARNED"))
 
 
-    @commands.has_permissions(kick_members=True)
-    @commands.command(pass_context=True)
-    async def warn(self, ctx, user, *, reason=""):
-        """Warn a user."""
-        server = ctx.message.server
-        issuer = ctx.message.author
-        logchannel = discord.utils.get(server.channels, name="warnings")
-        try:
-            member = ctx.message.mentions[0]
-        except IndexError:
-            await self.bot.say("Please tag an user.")
-            return
-        with open("data/warnsv2.json", "r") as f:
-            warns = json.load(f)
-            return
-        if member.id not in warns:
-            warns[member.id] = {"warns": []}
-        if discord.utils.get(ctx.message.server.roles, name="WARNED") in member.roles:
-            await self.bot.say("PREVENTING MULTI WARNING!")
-            return
+    @commands.has_permissions(kick_members=True) 
+    @commands.command(pass_context=True) 
+    async def warn(self, ctx, user, *, reason=""): 
+        """Warn a user.""" 
+        server = ctx.message.server 
+        issuer = ctx.message.author 
+        logchannel = discord.utils.get(server.channels, name="warnings") 
+        try: 
+            member = ctx.message.mentions[0] 
+        except IndexError: 
+            await self.bot.say("Please tag an user.") 
+            return 
+        with open("data/warnsv2.json", "r") as f: 
+            warns = json.load(f) 
         if issuer == member:
             await self.bot.say("I cannot let you do that. Self-harm is "
                                "bad \N{PENSIVE FACE}")
@@ -1259,14 +1253,19 @@ class Mod:
                                "not higher than the user in the role "
                                "hierarchy.")
             return
-        await self.bot.add_roles(member, discord.utils.get(ctx.message.server.roles, name="WARNED"))
-        warns[member.id]["name"] = member.name + "#" + member.discriminator
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        warns[member.id]["warns"].append({"issuer_id": issuer.id, "issuer_name": issuer.name, "reason": reason, "timestamp": timestamp})
-        with open("data/warnsv2.json", "w") as f:
-            json.dump(warns, f)
-        msg = "You have benn issued a warn {}.".format(server.name)
-        if reason != "":
+        if member.id not in warns: 
+            warns[member.id] = {"warns": []} 
+        if discord.utils.get(ctx.message.server.roles, name="WARNED") in member.roles: 
+            await self.bot.say("PREVENTING MULTI WARNING!") 
+            return 
+        await self.bot.add_roles(member, discord.utils.get(ctx.message.server.roles, name="WARNED")) 
+        warns[member.id]["name"] = member.name + "#" + member.discriminator 
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+        warns[member.id]["warns"].append({"issuer_id": issuer.id, "issuer_name": issuer.name, "reason": reason, "timestamp": timestamp}) 
+        with open("data/warnsv2.json", "w") as f: 
+            json.dump(warns, f) 
+        msg = "You have benn issued a warn {}.".format(server.name) 
+        if reason != "": 
             # much \n
             msg += " The reason is: " + reason
         msg += "\n\nPlease read the rules. This is warning number {}.".format(len(warns[member.id]["warns"]))
@@ -1274,9 +1273,9 @@ class Mod:
         if warn_count == 1:
             msg += " __Human, the next warning will kick you automatically.__"
         if warn_count == 2:
-            msg += "\n\nHuman, you have been kicked, one more warning and you will get Class D Personel."
+            msg += "\n\nHuman, you have been kicked, one more warning and you will be Muted."
         if warn_count >= 3:
-            msg += "\n\nHuman, you have gotten 3 warnings. You've been assigned as a Class D Personel now."
+            msg += "\n\nHuman, you have gotten 3 warnings. You've been Muted now."
         try:
             await self.bot.send_message(member, msg)
         except discord.errors.Forbidden:
@@ -1402,8 +1401,7 @@ class Mod:
             await self.bot.say("ERROR, user not tagged.")
             return
         if author == member:
-            await self.bot.say("I cannot let you do that. Self-harm is "
-                               "bad \N{PENSIVE FACE}")
+            await self.bot.say("Getting a little ahead of ourselves, eh?")
             return
         elif not self.is_allowed_by_hierarchy(server, author, member):
             await self.bot.say("I cannot let you do that. You are "
@@ -1481,8 +1479,7 @@ class Mod:
             await self.bot.say("ERROR, user not tagged.")
             return
         if author == member:
-            await self.bot.say("I cannot let you do that. Self-harm is "
-                               "bad \N{PENSIVE FACE}")
+            await self.bot.say("Getting a little ahead of ourselves, eh?")
             return
         elif not self.is_allowed_by_hierarchy(server, author, member):
             await self.bot.say("I cannot let you do that. You are "
