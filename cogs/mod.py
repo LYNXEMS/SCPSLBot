@@ -1532,13 +1532,13 @@ class Mod:
         msg = "🗑 **Cleared warns**: {} cleared {} warns from {} ({})".format(ctx.message.author.mention, warn_count, warns[user_id]["name"], user_id)
         await self.bot.send_message(logchannel, msg)
 
-chars = "\\`*_<>#@:~"
-def escape_name(name):
-    name = str(name)
-    for c in chars:
-        if c in name:
-            name = name.replace(c, "\\" + c)
-    return name.replace("@", "@\u200b")  # prevent mentions
+    def escape_name(name):
+        chars = "\\`*_<>#@:~"
+        name = str(name)
+        for c in chars:
+            if c in name:
+                name = name.replace(c, "\\" + c)
+        return name.replace("@", "@\u200b")  # prevent mentions
 
     async def mass_purge(self, messages):
         while messages:
