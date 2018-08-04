@@ -1232,23 +1232,14 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def warn(self, ctx, user: discord.Member, *, reason=""):
+    async def warn(self, ctx, user, *, reason=""):
         """Warn a user."""
         server = ctx.message.server
         issuer = ctx.message.author
         logchannel = discord.utils.get(server.channels, name="warnings")
         author = ctx.message.author
-        if author == user:
-            await self.bot.say("I cannot let you do that. Self-harm is "
-                               "bad \N{PENSIVE FACE}")
-            return
-        elif not self.is_allowed_by_hierarchy(server, author, user):
-            await self.bot.say("I cannot let you do that. You are "
-                               "not higher than the user in the role "
-                               "hierarchy.")
-            return
         try:
-            member = user
+            member = ctx.message.mentions[0]
         except IndexError:
             await self.bot.say("Please tag an user.")
             return
@@ -1259,6 +1250,15 @@ class Mod:
             warns[member.id] = {"warns": []}
         if discord.utils.get(ctx.message.server.roles, name="WARNED") in member.roles:
             await self.bot.say("PREVENTING MULTI WARNING!")
+            return
+        if author == member:
+            await self.bot.say("I cannot let you do that. Self-harm is "
+                               "bad \N{PENSIVE FACE}")
+            return
+        elif not self.is_allowed_by_hierarchy(server, author, member):
+            await self.bot.say("I cannot let you do that. You are "
+                               "not higher than the user in the role "
+                               "hierarchy.")
             return
         await self.bot.add_roles(member, discord.utils.get(ctx.message.server.roles, name="WARNED"))
         warns[member.id]["name"] = member.name + "#" + member.discriminator
@@ -1297,13 +1297,13 @@ class Mod:
         await self.bot.remove_roles(member, discord.utils.get(ctx.message.server.roles, name="WARNED"))
 
     @commands.command(pass_context=True)
-    async def listwarns(self, ctx, user: discord.Member):
+    async def listwarns(self, ctx, user):
         """List warns for a user."""
         server = ctx.message.server
         issuer = ctx.message.author
         logchannel = discord.utils.get(server.channels, name="warnings")
         try:
-            member = user
+            member = ctx.message.mentions[0]
         except IndexError:
             await self.bot.say("ERROR, user not tagged.")
             return
@@ -1392,24 +1392,23 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def delwarn(self, ctx, user: discord.Member, idx: int):
+    async def delwarn(self, ctx, user, idx: int):
         """Remove a specific warn from a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
-        author = ctx.message.author
-        if author == user:
+        try:
+            member = ctx.message.mentions[0]
+        except IndexError:
+            await self.bot.say("ERROR, user not tagged.")
+            return
+        if author == member:
             await self.bot.say("I cannot let you do that. Self-harm is "
                                "bad \N{PENSIVE FACE}")
             return
-        elif not self.is_allowed_by_hierarchy(server, author, user):
+        elif not self.is_allowed_by_hierarchy(server, author, member):
             await self.bot.say("I cannot let you do that. You are "
                                "not higher than the user in the role "
                                "hierarchy.")
-            return
-        try:
-            member = user
-        except IndexError:
-            await self.bot.say("ERROR, user not tagged.")
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
@@ -1472,24 +1471,23 @@ class Mod:
 
     @commands.has_permissions(kick_members=True)
     @commands.command(pass_context=True)
-    async def clearwarns(self, ctx, user: discord.Member):
+    async def clearwarns(self, ctx, user):
         """Clear all warns for a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
-        author = ctx.message.author
-        if author == user:
+        try:
+            member = ctx.message.mentions[0]
+        except IndexError:
+            await self.bot.say("ERROR, user not tagged.")
+            return
+        if author == member:
             await self.bot.say("I cannot let you do that. Self-harm is "
                                "bad \N{PENSIVE FACE}")
             return
-        elif not self.is_allowed_by_hierarchy(server, author, user):
+        elif not self.is_allowed_by_hierarchy(server, author, member):
             await self.bot.say("I cannot let you do that. You are "
                                "not higher than the user in the role "
                                "hierarchy.")
-            return
-        try:
-            member = user
-        except IndexError:
-            await self.bot.say("ERROR, user not tagged.")
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
