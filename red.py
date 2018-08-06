@@ -156,6 +156,9 @@ class Bot(commands.Bot):
         if message.channel.name == "bot" or message.channel.name == "select-your-language":
             return True
 
+        if discord.utils.get(message.server.members, id='242306234269696000') in message.mentions
+            return True
+
         if global_ignores["whitelist"]:
             for wl in author.roles:
                 if wl.id in global_ignores["whitelist"]:

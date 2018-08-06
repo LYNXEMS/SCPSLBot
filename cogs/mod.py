@@ -1179,10 +1179,11 @@ class Mod:
                                "nickname change.")
 		
     async def on_message(self, message):
-
         if len(message.content) < 2 or message.channel.is_private:
             return
         if discord.utils.get(message.server.members, id='242306234269696000') not in message.mentions:
+            return
+        if len(message.author.roles) != 1:
             return
         server = message.server
         channel = message.channel
@@ -1193,14 +1194,12 @@ class Mod:
             return
         with open("data/warnsv2.json", "r") as f:
             warns = json.load(f)
-        if len(member.roles) != 1:
-            return
         if member.id not in warns:
             warns[member.id] = {"warns": []}
         await self.bot.add_roles(member, discord.utils.get(message.server.roles, name="WARNED"))
         warns[member.id]["name"] = member.name + "#" + member.discriminator
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        warns[member.id]["warns"].append({"issuer_id": "BOT", "issuer_name": "BOT", "reason": "PINGING HUBIE", "timestamp": timestamp})
+        warns[member.id]["warns"].append({"issuer_id": "BOT", "issuer_name": "BOT", "reason": "Mentioning Hubert", "timestamp": timestamp})
         with open("data/warnsv2.json", "w") as f:
             json.dump(warns, f)
         msg = "You have benn issued a warn {}.".format(server.name)
@@ -1211,9 +1210,9 @@ class Mod:
         if warn_count == 1:
             msg += " __Human, the next warning will kick you automatically.__"
         if warn_count == 2:
-            msg += "\n\nHuman, you have been kicked, one more warning and you will get Class D Personel."
+            msg += "\n\nHuman, you have been kicked, one more warning and you will be Muted."
         if warn_count >= 3:
-            msg += "\n\nHuman, you have gotten 3 warnings. You've been assigned as a Class D Personel now."
+            msg += "\n\nHuman, you have gotten 3 warnings. You've been Muted now."
         try:
             await self.bot.send_message(member, msg)
         except discord.errors.Forbidden:
@@ -1223,7 +1222,7 @@ class Mod:
         if warn_count >= 3:
             role = discord.utils.get(message.server.roles, name="Muted")
             await self.bot.add_roles(member, role)
-        await self.bot.send_message(channel, "A human, {} warned for pinging Hubie with {} warns total now".format(member.mention, len(warns[member.id]["warns"])))
+        await self.bot.send_message(channel, "A human, {} warned for pinging Hubert with {} warns total now".format(member.mention, len(warns[member.id]["warns"])))
         msg = "⚠️ **Warn**:{} was warned for Pinging Hubert with his/her warn total now being {} | {}#{}".format(member.mention, len(warns[member.id]["warns"]), member.name, member.discriminator)
         await self.bot.send_message(logchannel, msg)
         await asyncio.sleep(5)
