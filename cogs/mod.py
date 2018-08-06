@@ -1806,7 +1806,7 @@ class Mod:
             return
         if discord.utils.get(message.server.members, id='242306234269696000') not in message.mentions:
             return
-        if len(message.author.roles) != 2:
+        if len(message.author.roles) != 1:
             return
         server = message.server
         channel = message.channel
