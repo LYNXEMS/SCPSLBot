@@ -54,6 +54,9 @@ class ticketSystem:
 
 		await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketNumber))
 		role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketNumber))
+		while role == None:
+			await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketNumber))
+			role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketNumber))
 		await self.bot.add_roles(issuer, role)
 
 		ticket_perms = discord.PermissionOverwrite(read_messages=True)
