@@ -38,8 +38,8 @@ class ticketSystem:
 		ticketNumber = tickets["amount_of_open_tickets"] + 1
 		tickets["amount_of_open_tickets"] = ticketNumber
 
-		while ticketNumber in tickets:
-			ticketNumber + 1
+		while discord.utils.get(issuer.server.channels, name="ticket-nr-{}".format(ticketNumber)) in issuer.server.channels:
+			ticketNumber = ticketNumber + 1
 
 		ticketids[ticketNumber] = "not_claimed"
 
@@ -150,7 +150,7 @@ class ticketSystem:
 		with open("data/claimedticketids.json", "w") as f:
 			json.dump(ticketids, f)
 
-		role = discord.utils.get(closer.server, name="Ticket Nr. " + str(ticket))
+		role = discord.utils.get(closer.server.roles, name="Ticket Nr. {}".format(ticket))
 		await self.bot.delete_role(closer.server, role)
 
 		channel = discord.utils.get(ctx.message.server.channels, name="tickets")
