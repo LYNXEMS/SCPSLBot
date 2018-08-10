@@ -1472,6 +1472,7 @@ class Mod:
         """Clear all warns for a user. Staff only."""
         server = ctx.message.server
         logchannel = discord.utils.get(server.channels, name="warnings")
+        author = ctx.message.author
         try:
             member = ctx.message.mentions[0]
         except IndexError:
