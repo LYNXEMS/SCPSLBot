@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 import json
-import os
-import random
 
 class ticketSystem:
 	def __init__(self, bot):
@@ -33,16 +31,16 @@ class ticketSystem:
 		if "amount_of_open_tickets" not in tickets:
 			tickets["amount_of_open_tickets"] = 0
 
-		ticketNumber = tickets["amount_of_open_tickets"] + 1
-		tickets["amount_of_open_tickets"] = ticketNumber
+		ticketnumber = tickets["amount_of_open_tickets"] + 1
+		tickets["amount_of_open_tickets"] = ticketnumber
 
-		while discord.utils.get(issuer.server.channels, name="ticket-nr-{}".format(ticketNumber)) in issuer.server.channels:
-			ticketNumber = ticketNumber + 1
+		while discord.utils.get(issuer.server.channels, name="ticket-nr-{}".format(ticketnumber)) in issuer.server.channels:
+			ticketnumber = ticketnumber + 1
 
-		ticket_claims[ticketNumber] = "not_claimed"
+		ticket_claims[ticketnumber] = "not_claimed"
 
-		tickets[ticketNumber] = {"ticket_data": []}
-		tickets[ticketNumber]["ticket_data"].append({"issuer_id": issuer.id, "issuer_name": issuer.name, "ticket_message": ticketmessage})
+		tickets[ticketnumber] = {"ticket_data": []}
+		tickets[ticketnumber]["ticket_data"].append({"issuer_id": issuer.id, "issuer_name": issuer.name, "ticket_message": ticketmessage})
 
 		await self.bot.say("Please read the FAQ before sending a ticket.(<#479000131316875274> for servers, and <#479000110400012310> for users) If you have read the FAQ, respond to this message with 'Y'. You have 15 seconds to reply. DO NOT send any other messages.")
 		msg = await self.bot.wait_for_message(timeout=15, author=issuer)
@@ -52,11 +50,11 @@ class ticketSystem:
 		if msg.content.upper() != "Y":
 			await self.bot.say("You have sent a message that was not 'Y'. Returning.")
 			return
-		await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketNumber))
-		role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketNumber))
+		await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
+		role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
 		while role == None:
-			await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketNumber))
-			role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketNumber))
+			await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
+			role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
 		await self.bot.add_roles(issuer, role)
 
 		ticket_perms = discord.PermissionOverwrite(read_messages=True)
@@ -67,14 +65,14 @@ class ticketSystem:
 		ticket = discord.ChannelPermissions(target=role, overwrite=ticket_perms)
 
 		try:
-			embed = discord.Embed(name="Ticket nr. {}".format(ticketNumber), description="Ticket nr. {}".format(ticketNumber), color=0xff0000)
-			embed.add_field(name="Ticket ID: ", value=ticketNumber, inline=True)
+			embed = discord.Embed(name="Ticket nr. {}".format(ticketnumber), description="Ticket nr. {}".format(ticketnumber), color=0xff0000)
+			embed.add_field(name="Ticket ID: ", value=ticketnumber, inline=True)
 			embed.add_field(name="Issuer Name: ", value=issuer.name, inline=True)
 			embed.add_field(name="Issuer ID: ", value=issuer.id, inline=True)
 			embed.add_field(name="Ticket Message: ", value=ticketmessage, inline=True)
 			channel = discord.utils.get(ctx.message.server.channels, name="tickets")
 			await self.bot.send_message(channel, embed=embed)
-			await self.bot.say("Thank you for submitting your ticket! It's ID is: {}".format(ticketNumber))
+			await self.bot.say("Thank you for submitting your ticket! It's ID is: {}".format(ticketnumber))
 		except discord.errors.HTTPException:
 			await self.bot.say("You have exceeded the character limit! The limit is somewhere around 1900(depends on the length of your nickname)")
 			return
@@ -85,7 +83,7 @@ class ticketSystem:
 		with open("data/claimedticketids.json", "w") as f:
 			json.dump(ticket_claims, f)
 
-		await self.bot.create_channel(issuer.server, "Ticket Nr. {}".format(ticketNumber), everyone, ticket)
+		await self.bot.create_channel(issuer.server, "Ticket Nr. {}".format(ticketnumber), everyone, ticket)
 
 
 	@ticket.command(pass_context=True)
@@ -150,8 +148,8 @@ class ticketSystem:
 
 		del tickets[ticket]
 
-		ticketNumber = tickets["amount_of_open_tickets"] - 1
-		tickets["amount_of_open_tickets"] = ticketNumber
+		ticketnumber = tickets["amount_of_open_tickets"] - 1
+		tickets["amount_of_open_tickets"] = ticketnumber
 
 		with open("data/tickets.json", "w") as f:
 			json.dump(tickets, f)
