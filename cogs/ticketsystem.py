@@ -52,7 +52,7 @@ class ticketSystem:
 			return
 		await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
 		role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
-		while role == None:
+		while role is None:
 			await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
 			role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
 		await self.bot.add_roles(issuer, role)
