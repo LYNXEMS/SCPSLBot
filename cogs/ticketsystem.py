@@ -34,8 +34,8 @@ class ticketSystem:
 		ticketnumber = tickets["amount_of_open_tickets"] + 1
 		tickets["amount_of_open_tickets"] = ticketnumber
 
-		while discord.utils.get(issuer.server.channels, name="ticket-nr-{}".format(ticketnumber)) in issuer.server.channels:
-			ticketnumber = ticketnumber + 1
+		while ticketnumber in tickets:
+			ticketnumber += 1
 
 		ticket_claims[ticketnumber] = "not_claimed"
 
@@ -50,19 +50,6 @@ class ticketSystem:
 		if msg.content.upper() != "Y":
 			await self.bot.say("You have sent a message that was not 'Y'. Returning.")
 			return
-		await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
-		role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
-		while role is None:
-			await self.bot.create_role(issuer.server, name="Ticket Nr. {}".format(ticketnumber))
-			role = discord.utils.get(issuer.server.roles, name="Ticket Nr. {}".format(ticketnumber))
-		await self.bot.add_roles(issuer, role)
-
-		ticket_perms = discord.PermissionOverwrite(read_messages=True)
-		everyone_perms = discord.PermissionOverwrite(read_messages=False)
-
-		techlead = discord.ChannelPermissions(target=discord.utils.get(issuer.server.roles, name="Tech Support Lead"), overwrite=ticket_perms)
-		everyone = discord.ChannelPermissions(target=issuer.server.default_role, overwrite=everyone_perms)
-		ticket = discord.ChannelPermissions(target=role, overwrite=ticket_perms)
 
 		try:
 			embed = discord.Embed(name="Ticket nr. {}".format(ticketnumber), description="Ticket nr. {}".format(ticketnumber), color=0xff0000)
@@ -83,38 +70,53 @@ class ticketSystem:
 		with open("data/claimedticketids.json", "w") as f:
 			json.dump(ticket_claims, f)
 
-		await self.bot.create_channel(issuer.server, "Ticket Nr. {}".format(ticketnumber), everyone, ticket)
-
 
 	@ticket.command(pass_context=True)
 	@commands.has_role("Tech Support")
 	async def claim(self, ctx):
-
+		server = ctx.message.server
 		claimer = ctx.message.author
 		ticket = ctx.message.content[14:]
+
 
 		if ticket == "":
 			await self.bot.say("Please input a ticket id")
 			return
+	
 
 		with open("data/claimedticketids.json", "r") as f:
 			ticket_claims = json.load(f)
 
+		a = open("data/tickets.json").read()
+		tickets = json.loads(a)
+
+
 		if ticket not in ticket_claims:
 			await self.bot.say("No ticket with that ID was found")
 			return
+
 
 		if ticket_claims[ticket] != "not_claimed":
 			await self.bot.say("This ticket is already claimed.")
 			return
 
 		ticket_claims[ticket] = claimer.id
+		role = discord.utils.get(server.roles, name="Tech Support Lead")
+		user = await self.bot.get_user_info(tickets[ticket]["ticket_data"][0][u'issuer_id'])
+
+		
+		ticket_perms = discord.PermissionOverwrite(read_messages=True)
+		everyone_perms = discord.PermissionOverwrite(read_messages=False)
+
+		techlead = discord.ChannelPermissions(target=role, overwrite=ticket_perms)
+		everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
+		ticketuser = discord.ChannelPermissions(target=user, overwrite=ticket_perms)
+		claimeruser = discord.ChannelPermissions(target=ctx.message.author, overwrite=ticket_perms)
+
+		await self.bot.create_channel(server, "Ticket Nr. {}".format(ticket), ticketuser, everyone, techlead, claimeruser) 
 
 		with open("data/claimedticketids.json", "w") as f:
 			json.dump(ticket_claims, f)
-
-		role = discord.utils.get(claimer.server.roles, name="Ticket Nr. {}".format(ticket))
-		await self.bot.add_roles(claimer, role)
 
 		channel = discord.utils.get(ctx.message.server.channels, name="tickets")
 		await self.bot.send_message(channel, claimer.name + " has claimed the ticket nr. " + ticket)
@@ -124,46 +126,42 @@ class ticketSystem:
 	@ticket.command(pass_context=True)
 	@commands.has_role("Tech Support")
 	async def close(self, ctx):
+		try:
+			closer = ctx.message.author
+			ticket = ctx.message.content[14:]
 
-		closer = ctx.message.author
-		ticket = ctx.message.content[14:]
+			if ticket == "":
+				await self.bot.say("Please input a ticket id")
+				return
 
-		if ticket == "":
-			await self.bot.say("Please input a ticket id")
-			return
+			with open("data/tickets.json", "r") as f:
+				tickets = json.load(f)
 
-		with open("data/tickets.json", "r") as f:
-			tickets = json.load(f)
+			with open("data/claimedticketids.json") as f:
+				ticket_claims = json.load(f)
 
-		with open("data/claimedticketids.json") as f:
-			ticket_claims = json.load(f)
+			if ticket not in ticket_claims:
+				await self.bot.say("No ticket with that ID was found")
+				return
 
-		if ticket not in ticket_claims:
+			if ticket_claims[ticket] == "not_claimed":
+				await self.bot.say("This ticket hasn't been claimed yet.")
+				return
+
+			del tickets[ticket]
+
+			with open("data/tickets.json", "w") as f:
+				json.dump(tickets, f)
+
+			with open("data/claimedticketids.json", "w") as f:
+				json.dump(ticket_claims, f)
+
+			channel = discord.utils.get(ctx.message.server.channels, name="tickets")
+			await self.bot.send_message(channel, closer.name + " has closed the ticket nr. " + ticket)
+
+			await self.bot.say("You have succesfully closed the ticket nr. " + ticket)
+		except KeyError:
 			await self.bot.say("No ticket with that ID was found")
-			return
-
-		if ticket_claims[ticket] == "not_claimed":
-			await self.bot.say("This ticket hasn't been claimed yet.")
-			return
-
-		del tickets[ticket]
-
-		ticketnumber = tickets["amount_of_open_tickets"] - 1
-		tickets["amount_of_open_tickets"] = ticketnumber
-
-		with open("data/tickets.json", "w") as f:
-			json.dump(tickets, f)
-
-		with open("data/claimedticketids.json", "w") as f:
-			json.dump(ticket_claims, f)
-
-		role = discord.utils.get(closer.server.roles, name="Ticket Nr. {}".format(ticket))
-		await self.bot.delete_role(closer.server, role)
-
-		channel = discord.utils.get(ctx.message.server.channels, name="tickets")
-		await self.bot.send_message(channel, closer.name + " has closed the ticket nr. " + ticket)
-
-		await self.bot.say("You have succesfully closed the ticket nr. " + ticket)
 
 	@ticket.command(pass_context=True)
 	@commands.has_role("Tech Support Lead")
@@ -211,9 +209,18 @@ class ticketSystem:
 			return
 		with open("data/claimedticketids.json") as f:
 			ticket_data = json.load(f)
+		with open("data/tickets.json") as f:
+			tickets = json.load(f)
 		if ticket_data[ticket] == "not_claimed":
 			await self.bot.say("This ticket has not been claimed yet.")
 			return
+
+		ticket = tickets["amount_of_open_tickets"] - 1
+		tickets["amount_of_open_tickets"] = ticket
+
+		with open("data/tickets.json") as f:
+			json.dump(tickets, f)
+		
 		await self.bot.send_message(ctx.message.author, "You have denied the ticket. The tech support member will not have this ticket added to his/her statistics.")
 		channel = discord.utils.get(ctx.message.server.channels, name="ticket-nr-{}".format(ticket))
 		await self.bot.delete_channel(channel)
