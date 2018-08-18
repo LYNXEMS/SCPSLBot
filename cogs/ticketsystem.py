@@ -177,6 +177,8 @@ class ticketSystem:
 			techstats = json.load(f)
 		with open("data/claimedticketids.json", "r") as f:
 			tickets = json.load(f)
+		with open("data/tickets.json", "r") as f:
+			ticketnumbers = json.load(f)
 
 		claimedtech = tickets[ticket]
 
@@ -188,6 +190,9 @@ class ticketSystem:
 			await self.bot.say("This tech support member is not in the statistics. First add him to the statistics file using !ticket addtech, and then approve the ticket.")
 			return
 
+		ticketnum = ticketnumbers["amount_of_open_tickets"] - 1
+		ticketnumbers["amount_of_open_tickets"] = ticketnum
+
 		techstats[claimedtech] = techstats[claimedtech] + 1
 
 		del tickets[ticket]
@@ -198,7 +203,9 @@ class ticketSystem:
 		with open("data/techsupportstats.json", "w") as f:
 			json.dump(techstats, f)
 		with open("data/claimedticketids.json", "w") as f:
-			json.dump(tickets, f)		
+			json.dump(tickets, f)
+		with open("data/tickets.json", "w") as f:
+			json.dump(ticketnumbers, f)
 
 	@ticket.command(pass_context=True)
 	@commands.has_role("Tech Support Lead")
