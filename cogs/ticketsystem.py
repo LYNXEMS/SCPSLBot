@@ -1,10 +1,24 @@
 import discord
 from discord.ext import commands
 import json
+import os
 
 class ticketSystem:
 	def __init__(self, bot):
 		self.bot = bot
+
+
+	if not os.path.exists("data/tickets.json"):
+		with open("data/tickets.json", mode='w') as f:
+            json.dump({}, f)
+	
+	if not os.path.exists("data/techsupportstats.json"):
+		with open("data/techsupportstats", mode='w') as f:
+            json.dump({}, f)
+
+	if not os.path.exists("data/claimedticketids.json"):
+		with open("data/claimedticketids.json", mode='w') as f:
+            json.dump({}, f)
 
 	@commands.group(pass_context=True)
 	async def ticket(self, ctx):
