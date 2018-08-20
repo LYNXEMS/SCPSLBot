@@ -299,8 +299,29 @@ class ticketSystem:
 			json.dump(stats, f)
 		await self.bot.say("You have succesfully removed a tech support member from the statistics file")
 
-
+	@ticket.command(pass_context=True)
+	@commands.has_role("Tech Support")
+	async def liststats(self, ctx):
+		with open("data/techsupportstats.json", "r") as f:
+			stats = json.load(f)
+		msg = ""
+		for key, value in stats.items():
+			user = await self.bot.get_user_info(key)
+			print (user.name, "had" , value, "tickets approved.")
+			msg = msg + user.name + " has " + str(value) + " tickets approved." + "\n"
+		await self.bot.say(msg)
 	
+	@ticket.command(pass_context=True)
+	@commands.has_role("Overseer")
+	async def purgestats(self, ctx):
+		with open ("data/techsupportstats.json", "r") as f:
+			stats1 = json.load(f)
+		with open ("data/techsupportstats.json", "r") as f:
+			stats2 = json.load(f)
+		for key in stats1.items():
+			stats2[key] = 0
+		await self.bot.say("Stats have been purged.")
+
 
 def setup(bot):
 	bot.add_cog(ticketSystem(bot))
